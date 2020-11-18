@@ -45,8 +45,8 @@ func NewServer() *http.Server {
 
 func newRouter() *mux.Router {
 	r := mux.NewRouter()
-	//r.HandleFunc("/token", handler.LoginHandler).Methods(http.MethodPost)
-	//r.HandleFunc("/sign-up", handler.SignupHandler).Methods(http.MethodPost)
+	r.HandleFunc("/token", handler.LoginHandler).Methods(http.MethodPost)
+	r.HandleFunc("/sign-up", handler.SignupHandler).Methods(http.MethodPost)
 
 	secured := r.PathPrefix("/auth").Subrouter()
 	secured.HandleFunc("/hello", handler.HelloHandler).Methods(http.MethodGet)

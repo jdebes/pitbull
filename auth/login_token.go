@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	issuer            = "pitbull"
 	jwtPrivateKeyPath = "etc/key/jwt_rsa.pem"
 	jwtPublicKeyPath  = "etc/key/jwt_rsa_pub.pem"
 	jwtExpiry         = 10 * time.Minute
@@ -57,22 +56,15 @@ func VerifyJwt(token string) (*UserClaims, bool, error) {
 	_, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtPublicKey, nil
 	})
-
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
-			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return nil, false, err
-			} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
-				return nil, true, nil
-			} else {
-				return nil, false, err
+			if ve.Errors == jwt.ValidationErrorExpired {
+				return nil, true, err
 			}
-		} else {
-			return nil, false, err
 		}
 	}
 
-	return &claims, false, nil
+	return &claims, false, err
 }
 
 func WithUserClaims(ctx context.Context, claims *UserClaims) context.Context {

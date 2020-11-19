@@ -30,12 +30,12 @@ func TokenMiddleware(next http.Handler) http.Handler {
 
 		claims, expired, err := VerifyJwt(token)
 		if err != nil {
-			api.Info(w, err, http.StatusBadRequest)
-			return
-		}
+			if expired {
+				api.Debug(w, err, http.StatusUnauthorized)
+			} else {
+				api.Debug(w, err, http.StatusBadRequest)
+			}
 
-		if expired {
-			api.Info(w, expiredError, http.StatusUnauthorized)
 			return
 		}
 
